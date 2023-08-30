@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"url-shortener/internal/config"
+	"url-shortener/internal/http-server/handler/redirect"
 	"url-shortener/internal/http-server/handler/save"
 	"url-shortener/internal/storage/sqlite"
 
@@ -39,6 +40,8 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 	router.Post("/url", save.New(storage))
+	router.Get("/{alias}", redirect.New(storage))
+	// router.Get("/url/{alias}", redirect.New(storage))
 
 	log.Println("start server", "address", cfg.Address)
 
