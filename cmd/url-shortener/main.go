@@ -14,6 +14,17 @@ import (
 )
 
 func main() {
+	// TODO: init logger: slong
+	// TODO: add func storage.DeleteUrl
+	// TODO: add template html
+	// TODO: add autheration
+	// TODO: handler
+	//		DeleteURL
+	//		GaveURL
+	// TODO: test handler
+	//		SaveURL
+	//		GaveURL
+	//		DeleteURL
 	cfg := config.MustLoad()
 
 	storage, err := sqlite.New(cfg.StoragePath)
