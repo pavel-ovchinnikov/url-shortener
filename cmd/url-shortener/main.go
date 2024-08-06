@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/pavel-ovchinnikov/url-shortener/internal/config"
+	"github.com/pavel-ovchinnikov/url-shortener/internal/storage/urlstorage"
 )
 
 func main() {
@@ -24,7 +25,13 @@ func main() {
 	// init logger
 	log := NewLogger()
 
-	// TODO: init storage
+	// init storage
+	dbStorage, err := urlstorage.NewURLStorage(&cfg.URLStorage)
+	if err != nil {
+		log.Error(err.Error())
+		return
+	}
+	_ = dbStorage
 
 	// init server
 	httpServer := NewHTTPServer(ctx, &cfg.HTTPServer)
