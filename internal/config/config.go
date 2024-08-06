@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -13,7 +14,8 @@ type Config struct {
 }
 
 type HTTPServer struct {
-	Address string `yaml:"address"`
+	Address string        `yaml:"address"`
+	Timeout time.Duration `yaml:"timeout"`
 }
 type URLStorage struct {
 	Path string `yaml:"path"`

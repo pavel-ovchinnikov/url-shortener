@@ -1,5 +1,6 @@
 http_server:
   address: "0.0.0.0:8082"
+  timeout: 3s
 
 storage:
   path: "./storage.db"
