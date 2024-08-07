@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/mattn/go-sqlite3"
+
 	"github.com/pavel-ovchinnikov/url-shortener/internal/config"
 )
 
@@ -13,7 +15,7 @@ type URLStorage struct {
 }
 
 func (s *URLStorage) SaveURL(ctx context.Context, url string, alias string) (int64, error) {
-	const op = "storage.sqlite.SaveURL"
+	const op = "storage.url_storage.SaveURL"
 
 	stmt, err := s.db.Prepare("INSERT INTO url(url, alias) VALUES(?, ?)")
 	if err != nil {
@@ -32,11 +34,13 @@ func (s *URLStorage) SaveURL(ctx context.Context, url string, alias string) (int
 
 	return id, nil
 }
+
 func (s *URLStorage) DeleteURL(ctx context.Context, url string) error {
 	return ErrNotImplementation
 }
+
 func (s *URLStorage) GetURL(ctx context.Context, alias string) (string, error) {
-	const op = "storage.sqlite.GetURL"
+	const op = "storage.url_storage.GetURL"
 
 	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = ?")
 	if err != nil {
@@ -53,7 +57,7 @@ func (s *URLStorage) GetURL(ctx context.Context, alias string) (string, error) {
 }
 
 func NewURLStorage(cfg *config.URLStorage) (*URLStorage, error) {
-	const op = "storage.sqlite.New"
+	const op = "storage.url_storage.New"
 
 	db, err := sql.Open("sqlite3", cfg.Path)
 	if err != nil {
