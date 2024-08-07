@@ -7,11 +7,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/go-chi/chi/v5"
+
 	"github.com/pavel-ovchinnikov/url-shortener/internal/config"
-	"github.com/pavel-ovchinnikov/url-shortener/internal/storage/urlstorage"
+	handler_redirect "github.com/pavel-ovchinnikov/url-shortener/internal/endpoint/http/redirect"
+	handler_remove "github.com/pavel-ovchinnikov/url-shortener/internal/endpoint/http/url/remove"
+	handler_save "github.com/pavel-ovchinnikov/url-shortener/internal/endpoint/http/url/save"
+	url_storage "github.com/pavel-ovchinnikov/url-shortener/internal/storage/url_storage"
 )
 
 func main() {
@@ -22,11 +25,11 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	// init logger
+	// init log
 	log := NewLogger()
 
 	// init storage
-	dbStorage, err := urlstorage.NewURLStorage(&cfg.URLStorage)
+	dbStorage, err := url_storage.NewURLStorage(&cfg.URLStorage)
 	if err != nil {
 		log.Error(err.Error())
 		return
@@ -34,7 +37,7 @@ func main() {
 	_ = dbStorage
 
 	// init server
-	httpServer := NewHTTPServer(ctx, &cfg.HTTPServer)
+	httpServer := NewHTTPServer(ctx, log, &cfg.HTTPServer, dbStorage)
 
 	// run server
 	if err := httpServer.ListenAndServe(); err != nil {
@@ -48,24 +51,24 @@ func NewLogger() *slog.Logger {
 	)
 }
 
-func NewHTTPServer(ctx context.Context, cfg *config.HTTPServer) *http.Server {
-	handlerFunc := func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("500 - Something bad happened!"))
-	}
-
+func NewHTTPServer(
+	ctx context.Context,
+	log *slog.Logger,
+	cfg *config.HTTPServer,
+	dbStorage *url_storage.URLStorage,
+) *http.Server {
 	router := chi.NewRouter()
 	router.Route("/url", func(r chi.Router) {
-		r.Post("/", handlerFunc)
-		r.Delete("/", handlerFunc)
+		r.Post("/", handler_save.NewURLSave(log, dbStorage).Handler)
+		r.Delete("/", handler_remove.NewURLRemove(log, dbStorage).Handler)
 	})
-	router.Get("/{alias}", handlerFunc)
+	router.Get("/{alias}", handler_redirect.NewRedirect(log, dbStorage).Handler)
 
 	return &http.Server{
 		Addr:         cfg.Address,
 		Handler:      router,
-		ReadTimeout:  time.Duration(time.Second * 2),
-		WriteTimeout: time.Duration(time.Second * 2),
-		IdleTimeout:  time.Duration(time.Second * 2),
+		ReadTimeout:  cfg.Timeout,
+		WriteTimeout: cfg.Timeout,
+		IdleTimeout:  cfg.Timeout,
 	}
 }

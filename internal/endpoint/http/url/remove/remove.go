@@ -1,4 +1,4 @@
-package save
+package remove
 
 import (
 	"context"
@@ -7,21 +7,21 @@ import (
 )
 
 type URLStorage interface {
-	SaveURL(ctx context.Context, url string, alias string) (int64, error)
+	DeleteURL(ctx context.Context, url string) error
 }
 
-type URLSave struct {
+type URLRemove struct {
 	storage URLStorage
 	log     *slog.Logger
 }
 
-func (h *URLSave) Handler(w http.ResponseWriter, r *http.Request) {
+func (h *URLRemove) Handler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("500 - Something bad happened!"))
 }
 
-func NewURLSave(log *slog.Logger, storage URLStorage) *URLSave {
-	return &URLSave{
+func NewURLRemove(log *slog.Logger, storage URLStorage) *URLRemove {
+	return &URLRemove{
 		storage: storage,
 		log:     log,
 	}
