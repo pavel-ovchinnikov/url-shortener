@@ -1,0 +1,9 @@
+services:
+  go-server:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    ports:
+      - "8082:8082"
+    # volumes:
+    #   - ../../cmd:/app/cmd

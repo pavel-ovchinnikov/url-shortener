@@ -37,5 +37,16 @@ clean:
 	rm -rf ${BIN_DIR}
 	@echo "🧹 Done"
 
-deploy:
+deploy-docker:
 	@echo "Nothing to deploy yet"
+
+# IMAGE_NAME=go-server
+
+docker-build:
+	docker-compose -f deploy/docker/docker-compose.yml build
+
+docker-up: docker-build
+	docker-compose -f deploy/docker/docker-compose.yml up -d
+
+docker-down:
+	docker-compose -f deploy/docker/docker-compose.yml down
