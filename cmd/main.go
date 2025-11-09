@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/pavel-ovchinnikov/url-shortener/internal/config"
+	"github.com/pavel-ovchinnikov/url-shortener/internal/endpoints/http/handlers"
 )
 
 func main() {
@@ -20,7 +23,9 @@ func main() {
 
 	// TODO: init cache
 
-	// TODO: init http server
+	mux := http.NewServeMux()
+	handlers.RegisterHandlers(mux)
 
-	// TODO: start http server
+	fmt.Printf("Server started at %s\n", cfg.HTTPServer.Address)
+	log.Fatal(http.ListenAndServe(cfg.HTTPServer.Address, mux))
 }
