@@ -1,8 +1,9 @@
 services:
-  go-server:
+  backend:
     build:
       context: ../..
       dockerfile: deploy/docker/Dockerfile
+    image: backend:latest
     ports:
       - "8082:8082"
     # volumes:

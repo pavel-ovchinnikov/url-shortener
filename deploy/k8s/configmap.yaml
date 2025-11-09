@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  local.yaml: |
+    http_server:
+      address: ":8082"
+      timeout: 4s
+      idle_timeout: 60s
