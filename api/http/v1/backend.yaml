@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: URL Shortener API
+  version: 1.0.0
+  description: Simple service to shorten URLs and redirect users.
+
+servers:
+  - url: https://api.example.com
+
+paths:
+  /shorten:
+    post:
+      summary: Create a short URL
+      operationId: createShortUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+              required:
+                - url
+      responses:
+        "201":
+          description: Short URL created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shortUrl:
+                    type: string
+                    example: https://ex.am/abcd12
+        "400":
+          description: Invalid URL
+
+  /{code}:
+    get:
+      summary: Redirect to original URL
+      operationId: redirectByCode
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+            example: abcd12
+      responses:
+        "302":
+          description: Redirecting to the original URL
+          headers:
+            Location:
+              description: Target URL
+              schema:
+                type: string
+                format: uri
+        "404":
+          description: Code not found
